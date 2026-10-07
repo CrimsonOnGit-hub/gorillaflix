@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GorillaFlix</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ================= MAIN APPLICATION ================= -->
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">GorillaFlix</div>
+    <div class="logo-sub" id="modeLabel">Media Hub</div>
+    
+    <nav class="nav-menu">
+      <button class="nav-item active" id="nav-movies" type="button"><span class="nav-icon">&#127916;</span> Movies</button>
+      <button class="nav-item" id="nav-music" type="button"><span class="nav-icon">&#127925;</span> Music</button>
+      <button class="nav-item" id="nav-images" type="button"><span class="nav-icon">&#128444;</span> Images</button>
+      <button class="nav-item" id="nav-test" type="button"><span class="nav-icon">&#9654;</span> Player Test</button>
+      <button class="nav-item" id="nav-about" type="button"><span class="nav-icon">&#8505;</span> About</button>
+    </nav>
+
+    <div class="user-box">
+      <div class="mode-indicator" id="userMode">&#9679; Offline Edition</div>
+      <div class="user-status-text" id="userEmail">Local Storage</div>
+      <button class="link-btn" id="btnDirectoryPicker" type="button">Select Library Folder</button>
+      <button class="link-btn" id="btnSignOut">Sign out</button>
+      <button class="link-btn hidden" id="btnSignInModal">Sign in to Cloud</button>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="main" id="mainPane">
+
+    <!-- MOVIES VIEW -->
+    <section class="view active" id="view-movies">
+      <div class="header-row">
+        <div>
+          <h1>Cinema</h1>
+          <p class="section-subtitle">Browse, play, and curate your film collection</p>
+        </div>
+        <div class="header-actions">
+          <div class="filter-controls">
+            <input type="text" class="search-input" id="movieSearch" placeholder="Search title, cast, year...">
+            <select class="sort-select" id="movieSort">
+              <option value="title-asc">Title (A-Z)</option>
+              <option value="title-desc">Title (Z-A)</option>
+              <option value="year-desc">Year (Newest)</option>
+              <option value="year-asc">Year (Oldest)</option>
+              <option value="recent">Recently Added</option>
+            </select>
+            <select class="sort-select" id="genreFilter">
+              <option value="">All Genres</option>
+            </select>
+          </div>
+          <button class="pill-btn" id="btnRebuildMissing" type="button">&#8635; Rebuild Missing GMD</button>
+          <button class="pill-btn" id="btnImportGmd" type="button">&#10515; Import GMD</button>
+          <button class="pill-btn" id="btnRefreshMovies" type="button">Refresh</button>
+          <button class="upload-btn" id="btnUploadMovie" type="button">+ Add Movie</button>
+          <input type="file" id="importGmdFile" accept=".gmd,.json" class="hidden">
+        </div>
+      </div>
+      <div class="grid" id="grid-movies"></div>
+    </section>
+
+    <!-- MUSIC VIEW -->
+    <section class="view" id="view-music">
+      <div class="header-row">
+        <div>
+          <h1>Music</h1>
+          <p class="section-subtitle">Original soundtracks and local audio tracks</p>
+        </div>
+        <div class="header-actions">
+          <input type="text" class="search-input" id="musicSearch" placeholder="Search track or artist...">
+          <button class="pill-btn" id="btnRefreshMusic" type="button">Refresh</button>
+          <button class="upload-btn" id="btnAddMusic" type="button">+ Add Track</button>
+        </div>
+      </div>
+      <div class="grid" id="grid-music"></div>
+    </section>
+
+    <!-- IMAGES VIEW -->
+    <section class="view" id="view-images">
+      <div class="header-row">
+        <div>
+          <h1>GorillaImages</h1>
+          <p class="section-subtitle">Visual galleries and still captures</p>
+        </div>
+        <div class="header-actions">
+          <input type="text" class="search-input" id="imageSearch" placeholder="Search images...">
+          <button class="pill-btn" id="btnRefreshImages" type="button">Refresh</button>
+          <button class="upload-btn" id="btnAddImage" type="button">+ Add Image</button>
+        </div>
+      </div>
+      <div class="grid" id="grid-images"></div>
+    </section>
+
+    <!-- PLAYER TEST VIEW -->
+    <section class="view" id="view-test">
+      <div class="header-row">
+        <div>
+          <h1>Player Test</h1>
+          <p class="section-subtitle">Independent playback testing bench for LavaPlayer</p>
+        </div>
+      </div>
+      <div class="test-box">
+        <p>Test media files directly in LavaPlayer with custom seek, volume, speed, and real-time statistics readout. Press <b>I</b> in player for live stats.</p>
+        
+        <div class="test-form">
+          <label for="testLocalFile">Select local media file</label>
+          <input type="file" id="testLocalFile" accept="video/*,audio/*" class="file-picker-input">
+          
+          <div class="divider-text">OR</div>
+          
+          <label for="testUrl">Stream from URL</label>
+          <input type="text" id="testUrl" placeholder="https://example.com/video.mp4">
+          
+          <div class="test-actions">
+            <button class="btn-tv btn-tv-primary" id="btnTestPlay" type="button">&#9654; Open in LavaPlayer</button>
+          </div>
+        </div>
+
+        <div class="keys-guide">
+          <h4>Player Controls & Shortcuts</h4>
+          <div class="keys-grid">
+            <div><b>Space / K</b> Play / Pause</div>
+            <div><b>&larr; &rarr;</b> Seek &plusmn;5 sec</div>
+            <div><b>J / L</b> Seek &plusmn;10 sec</div>
+            <div><b>&uarr; &darr;</b> Volume &plusmn;5%</div>
+            <div><b>M</b> Mute / Unmute</div>
+            <div><b>F</b> Fullscreen</div>
+            <div><b>0 &ndash; 9</b> Jump to 0% &ndash; 90%</div>
+            <div><b>I</b> Technical Stats</div>
+            <div><b>Esc</b> Close / Exit Fullscreen</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT VIEW -->
+    <section class="view" id="view-about">
+      <div class="about-box">
+        <div class="about-logo">GorillaFlix</div>
+        <div class="about-edition">Media Hub &bull; Professional Edition</div>
+        <p class="about-desc">
+          GorillaFlix is a high-performance personal media ecosystem featuring synchronized metadata curation, per-film GMD specification, cast hierarchy ordering, and high-fidelity media playback.
+        </p>
+        <div class="about-card">
+          <div class="about-meta-row">
+            <span>Core Version:</span>
+            <strong>2.0 HTML & Native Build</strong>
+          </div>
+          <div class="about-meta-row">
+            <span>Video Engine:</span>
+            <strong>LavaPlayer</strong>
+          </div>
+          <div class="about-meta-row">
+            <span>Metadata Layout:</span>
+            <strong>Phase 1 Unified Directory Architecture</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- STATUS BAR -->
+  <footer class="statusbar">
+    <span id="statusText">Ready</span>
+    <span class="right" id="statusCount">0 items</span>
+  </footer>
+</div>
+
+<!-- ================= HUB (DETAIL VIEW) ================= -->
+<div class="hub" id="hub">
+  <button class="close-btn" id="hubClose" type="button">&#10005; Close</button>
+  <div class="hub-backdrop" id="hubBackdrop"></div>
+  <div class="hub-content" id="hubContent"></div>
+</div>
+
+<!-- ================= LIGHTBOX ================= -->
+<div class="lightbox" id="lightbox">
+  <button class="close-btn" id="lightboxClose" type="button">&#10005; Close</button>
+  <div class="lightbox-inner">
+    <img id="lightboxImg" alt="GorillaImages Preview">
+  </div>
+</div>
+
+<!-- ================= LAVAPLAYER LAYER ================= -->
+<div class="player-layer" id="playerLayer">
+  <div class="lp paused" id="lpRoot">
+    <!-- HTML5 Video / Audio Host -->
+    <div class="lp-video-host" id="lpVideoHost">
+      <video id="lpVideo" playsinline></video>
+      <audio id="lpAudio"></audio>
+    </div>
+
+    <!-- Audio Album Art Visualizer -->
+    <div class="lp-art" id="lpArt">
+      <div class="lp-art-img" id="lpArtImg">&#9835;</div>
+      <div class="lp-art-text">
+        <div class="lp-art-title" id="lpArtTitle"></div>
+        <div class="lp-art-sub" id="lpArtSub"></div>
+      </div>
+    </div>
+
+    <!-- Player Overlay UI -->
+    <div class="lp-ui" id="lpUI">
+      <div class="lp-top">
+        <button class="lp-back" id="lpBack" type="button">&larr; Back</button>
+        <div class="lp-title" id="lpTitle"></div>
+        <div class="lp-ver">LAVA<b>PLAYER</b> 2.0</div>
+      </div>
+
+      <button class="lp-center" id="lpCenter" type="button" aria-label="Play">&#9654;</button>
+      <div class="lp-spin" id="lpSpin"></div>
+
+      <!-- Stats Readout Panel (Toggled with 'I') -->
+      <div class="lp-stats hidden" id="lpStats">
+        <h4>Playback Diagnostics</h4>
+        <div id="lpStatsContent"></div>
+      </div>
+
+      <div class="lp-error" id="lpError">
+        <h4>Playback Problem</h4>
+        <p id="lpErrorText"></p>
+      </div>
+
+      <div class="lp-toast" id="lpToast"></div>
+
+      <div class="lp-bottom">
+        <div class="lp-seek" id="lpSeek">
+          <div class="lp-seek-track">
+            <div class="lp-buf" id="lpBuf"></div>
+            <div class="lp-prog" id="lpProg"></div>
+          </div>
+          <div class="lp-knob" id="lpKnob"></div>
+          <div class="lp-tip" id="lpTip">0:00</div>
+        </div>
+
+        <div class="lp-row">
+          <button class="lp-btn" id="lpPlayBtn" type="button" title="Play / Pause">&#9654;</button>
+          <span class="lp-vol">
+            <button class="lp-btn" id="lpMuteBtn" type="button" title="Mute">&#128266;</button>
+            <input class="lp-volrange" id="lpVolRange" type="range" min="0" max="100" value="100">
+          </span>
+          <span class="lp-time"><span id="lpCur">0:00</span> / <span id="lpDur">0:00</span></span>
+
+          <span class="lp-right">
+            <select class="lp-rate" id="lpRate" title="Playback Speed">
+              <option value="0.5">0.5x</option>
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1x Normal</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+              <option value="2">2x</option>
+            </select>
+            <button class="lp-btn" id="lpFsBtn" type="button" title="Toggle Fullscreen">&#9974;</button>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= METADATA EDITOR & UPLOAD DRAWER ================= -->
+<div class="drawer" id="uploadDrawer">
+  <div class="drawer-header">
+    <h3 id="drawerTitle">Edit Movie</h3>
+    <button class="drawer-close-x" id="drawerCloseX" type="button">&#10005;</button>
+  </div>
+  <p class="hint" id="drawerHint">All updates conform to the per-movie .gmd specification and Phase 1 folder structure.</p>
+
+  <div class="drawer-body">
+    <div class="form-group" id="groupMovieFile">
+      <label for="upFile">Movie Video File (.mp4, .mkv, .webm)</label>
+      <input type="file" id="upFile" accept="video/*">
+      <div class="file-name-preview" id="upFilePreview"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="upTitle">Movie Title <span class="required-star">*</span></label>
+      <input type="text" id="upTitle" placeholder="e.g. Inception">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="upYear">Year <span class="required-star">*</span></label>
+        <input type="text" id="upYear" maxlength="4" placeholder="e.g. 2026">
+      </div>
+      <div class="form-group">
+        <label for="upRating">Rating</label>
+        <input type="text" id="upRating" placeholder="PG-13, R, G, etc.">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="upGenre">Genre</label>
+        <input type="text" id="upGenre" placeholder="Sci-Fi, Action, Drama...">
+      </div>
+      <div class="form-group">
+        <label for="upCollection">Collection</label>
+        <input type="text" id="upCollection" placeholder="e.g. GorillaFlix Originals">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="upTagline">Tagline</label>
+      <input type="text" id="upTagline" placeholder="A brief promotional catchphrase">
+    </div>
+
+    <div class="form-group">
+      <label for="upDesc">Description</label>
+      <textarea id="upDesc" placeholder="Full storyline and synopsis..."></textarea>
+    </div>
+
+    <!-- ARTWORK PICKERS (RULE 11: UPLOAD ONLY, WITH REMOVE BUTTONS) -->
+    <div class="up-section">Artwork & Imagery</div>
+    
+    <div class="art-upload-block">
+      <label>Poster Art</label>
+      <div class="art-picker-row">
+        <input type="file" id="upPoster" accept="image/*" class="art-file-input">
+        <button type="button" class="btn-remove-art" id="btnRemovePoster">Remove</button>
+      </div>
+      <div class="art-preview-thumb" id="posterPreviewThumb"></div>
+    </div>
+
+    <div class="art-upload-block">
+      <label>Background Banner</label>
+      <div class="art-picker-row">
+        <input type="file" id="upBanner" accept="image/*" class="art-file-input">
+        <button type="button" class="btn-remove-art" id="btnRemoveBanner">Remove</button>
+      </div>
+      <div class="art-preview-thumb" id="bannerPreviewThumb"></div>
+    </div>
+
+    <div class="art-upload-block">
+      <label>Title Image Logo</label>
+      <div class="art-picker-row">
+        <input type="file" id="upTitleImg" accept="image/*" class="art-file-input">
+        <button type="button" class="btn-remove-art" id="btnRemoveTitleImg">Remove</button>
+      </div>
+      <div class="art-preview-thumb" id="titleImgPreviewThumb"></div>
+    </div>
+
+    <!-- CAST MANAGER (PHASE 3: UP & DOWN REORDER ARROWS, CONFIRMATION) -->
+    <div class="up-section">
+      <span>Cast & Characters</span>
+      <span class="up-section-sub">Use &uarr; and &darr; to order billing</span>
+    </div>
+    <div id="upCastContainer" class="cast-editor-container"></div>
+    <button type="button" class="add-cast-btn" id="btnAddActor">+ Add Actor</button>
+
+    <div class="up-validation-error hidden" id="upValidationError"></div>
+  </div>
+
+  <div class="drawer-footer">
+    <button type="button" class="btn-tv btn-tv-primary" id="upSubmit">Save Changes</button>
+    <button type="button" class="btn-tv btn-tv-secondary" id="upCancel">Cancel</button>
+  </div>
+</div>
+
+<!-- ================= IN-APP CONFIRMATION & PROMPT MODAL (RULE 10) ================= -->
+<div class="custom-modal-backdrop hidden" id="customModal">
+  <div class="custom-modal-box">
+    <h3 id="modalTitle">Confirm Action</h3>
+    <p id="modalMessage">Are you sure you want to proceed?</p>
+    <div class="modal-input-wrap hidden" id="modalInputWrap">
+      <input type="text" id="modalInput" class="modal-text-input">
+    </div>
+    <div class="modal-buttons">
+      <button type="button" class="btn-tv btn-tv-primary" id="modalBtnConfirm">Confirm</button>
+      <button type="button" class="btn-tv btn-tv-secondary" id="modalBtnCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST MESSAGE SYSTEM -->
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
